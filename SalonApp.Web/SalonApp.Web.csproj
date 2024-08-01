@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SalonApp.Core\SalonApp.Core.csproj" />
+  </ItemGroup>
+
 </Project>

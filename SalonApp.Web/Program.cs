@@ -1,7 +1,17 @@
+using SalonApp.Core.Interfaces;
+using SalonApp.Web.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient<ApiClienteService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
+});
+
+builder.Services.AddScoped<IClienteService, ApiClienteService>();
 
 var app = builder.Build();
 
