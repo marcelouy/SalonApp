@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SalonApp.Core.Entities;
 using SalonApp.Core.Interfaces;
 using SalonApp.Infrastructure.Data;
-
-namespace SalonApp.Infrastructure.Repositories;
 
 public class ClienteRepository : IClienteRepository
 {
@@ -11,19 +12,19 @@ public class ClienteRepository : IClienteRepository
 
     public ClienteRepository(ApplicationDbContext context)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    // Implementa los métodos de IClienteRepository
-
-    public Task<Cliente> CreateAsync(Cliente cliente)
+    public async Task<Cliente> CreateAsync(Cliente cliente)
     {
-        throw new NotImplementedException();
+        await _context.Clientes.AddAsync(cliente);
+        await _context.SaveChangesAsync();
+        return cliente;
     }
 
-    public Task DeleteAsync(int id)
+    public async Task<Cliente> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return await _context.Clientes.FindAsync(id);
     }
 
     public async Task<IEnumerable<Cliente>> GetAllAsync()
@@ -31,15 +32,31 @@ public class ClienteRepository : IClienteRepository
         return await _context.Clientes.ToListAsync();
     }
 
-    public Task<Cliente?> GetByIdAsync(int id)
+    public async Task<Cliente> AddAsync(Cliente cliente)
     {
-        throw new NotImplementedException();
+        _context.Clientes.Add(cliente);
+        await _context.SaveChangesAsync();
+        return cliente;
     }
 
-    public Task UpdateAsync(Cliente cliente)
+    public async Task UpdateAsync(Cliente cliente)
     {
-        throw new NotImplementedException();
+        _context.Entry(cliente).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
     }
 
-    // Implementa otros métodos...
+    public async Task DeleteAsync(int id)
+    {
+        var cliente = await _context.Clientes.FindAsync(id);
+        if (cliente != null)
+        {
+            _context.Clientes.Remove(cliente);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<bool> ExistsAsync(int id)
+    {
+        return await _context.Clientes.AnyAsync(e => e.Id == id);
+    }
 }
